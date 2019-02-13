@@ -12,12 +12,32 @@ var PlayState = {
         this.setChar();
         this.setOtherPlayer();
         socket.emit("character stage", { id: id, pic: this.char.key, x: this.char.position.x, y: this.char.position.y, sceneSelected: this.game.global.sceneSelected });
+        game.input.onTap.add(this.onTap, this);
 
         var homeBtn = game.add.button(game.world.centerX, game.world.centerY, 'homeBtn', this.onHome, this, 0, 0, 1);
         homeBtn.anchor.setTo(-8, 4.9);
         homeBtn.scale.setTo(0.1, 0.1);
 
         cursors = game.input.keyboard.createCursorKeys();
+
+    },
+    onTap: function (pointer, doubleTap) {
+        if (pointer.y > game.world.height * 0.8) {
+            const isLeft = pointer.x < this.char.position.x;
+            const newX = pointer.x - (this.char.width * 0.5), newY = pointer.y - (this.char.height * 0.9);
+
+            this.tween = game.add.tween(this.char).to({ x: newX, y: newY }, 1000, Phaser.Easing.Linear.None, true);
+            // this.char.position.x = pointer.x - (this.char.width * 0.5);
+            // this.char.position.y = pointer.y - (this.char.height * 0.9);
+            if (this.game.global.charSelected == 0) {
+                this.char.loadTexture(isLeft ? 'char_n_l' : 'char_n', 0);
+            } else {
+                this.char.loadTexture(isLeft ? 'char_t_l' : 'char_t', 0);
+            }
+        }
+    },
+    render: function () {
+        this.tween && this.tween.isRunning && socket.emit("character stage", { id: id, pic: this.char.key, x: this.char.position.x, y: this.char.position.y, sceneSelected: this.game.global.sceneSelected });
 
     },
     setOtherPlayer: function () {
@@ -94,13 +114,13 @@ var PlayState = {
             this.char.position.y += 2;
         }
 
-        if (this.char.position.x == 0) {
+        if (this.char.position.x <= 2) {
             this.char.position.x = 2;
-        } else if (this.char.position.x == 800) {
+        } else if (this.char.position.x >= 798) {
             this.char.position.x = 798;
-        } else if (this.char.position.y == 230) {
+        } else if (this.char.position.y >= 228) {
             this.char.position.y = 228;
-        } else if (this.char.position.y == 168) {
+        } else if (this.char.position.y <= 170) {
             this.char.position.y = 170;
         }
 
@@ -120,5 +140,5 @@ var PlayState = {
             return true;
         }
         return false;
-    },
+    }
 };
