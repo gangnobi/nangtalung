@@ -47,7 +47,10 @@ io.on("connection", function (socket) {
     io.emit("character delete", _id);
   });
 });
+// set the port of our application
+// process.env.PORT lets the port be set by Heroku
+var port = process.env.PORT || 8080;
 
-http.listen(8080, function () {
-  console.log("listening on *:8080");
+http.listen(port, function () {
+  console.log("listening on *:" + port);
 });
